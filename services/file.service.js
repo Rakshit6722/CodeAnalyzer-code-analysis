@@ -1,6 +1,8 @@
 const ApiError = require('../utils/ApiError');
 const CodeFile = require('../models/CodeFile.model');
-const { gfs } = require('../config/gridfsConnection')
+const { getGFS } = require('../config/gridfsConnection');
+const mongoose = require('mongoose');
+
 
 /**
  * upload file metadata to db
@@ -35,7 +37,10 @@ exports.saveFileMetaData = async (file, fileData) => {
 
 exports.getFileStream = async (fileId) => {
     try {
-        return gfs.openDownloadStream(fileId)
+
+        const gfs = getGFS()
+
+        return gfs.openDownloadStream(new mongoose.Types.ObjectId(fileId));
     }catch(err){
         console.error("Error getting file stream:", err)
         throw new Error("Error getting file stream" + err.message)
@@ -50,7 +55,10 @@ exports.getFileStream = async (fileId) => {
 
 exports.deleteFile = async (fileId) => {
     try{
-        await gfs.delete(fileId)
+
+        const gfs = getGFS()
+
+        await gfs.delete(new mongoose.Types.ObjectId(fileId))
         await CodeFile.findOneAndDelete({fileId})
 
         return { message: "File deleted successfully" }
