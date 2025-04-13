@@ -118,3 +118,14 @@ exports.deleteFile = async (req, res) => {
         res.status(500).json({ error: "Delete failed" });
     }
 };
+
+exports.getAllFile = async (req, res) => {
+    try{
+        const userId = req.userId
+        const files = await CodeFile.find({ userId }).sort({ createdAt: -1 })
+        res.status(200).json(files)
+    }catch(err){
+        console.error("Error getting all files:", err)
+        res.status(500).json({ message: "Error getting all files", error: err.message })
+    }
+}
